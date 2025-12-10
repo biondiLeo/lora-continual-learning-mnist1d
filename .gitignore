@@ -1,0 +1,25 @@
+# virtual environment
+.venv/
+
+# python cache
+__pycache__/
+*.pyc
+
+# outputs / results
+outputs_full_ft/
+outputs_lora_cl/
+
+# model checkpoints and features
+*.pt
+*.npz
+
+# data (downloaded automatically)
+data/
+
+# local test files
+test_*.py
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
