@@ -6,6 +6,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
+#per distinguere il terminale da eventuali notebook colab/jupyter
+try:
+    from IPython.display import display
+    IN_NOTEBOOK = True
+except ImportError:
+    IN_NOTEBOOK = False
+
 # -----------------------------
 # Path progetto
 # -----------------------------
@@ -25,7 +32,12 @@ def load_features(path: Path):
 
 
 def plot_pca(
-    features, labels, title, save_path, pca=None
+    features,
+    labels,
+    title,
+    save_path,
+    pca=None,
+    show: bool = True,
 ):
     if pca is None:
         pca = PCA(n_components=2)
@@ -34,15 +46,21 @@ def plot_pca(
         Z = pca.transform(features)
 
     plt.figure(figsize=(6, 5))
-    sc = plt.scatter(Z[:, 0], Z[:, 1], c=labels, s=5, alpha=0.7)
+    sc = plt.scatter(Z[:, 0], Z[:, 1], c=labels, s=6, alpha=0.7)
     plt.colorbar(sc, label="classe")
-    plt.title(title)
     plt.xlabel("PC1")
     plt.ylabel("PC2")
+    plt.title(title)
     plt.tight_layout()
 
+    # salva sempre
     save_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(save_path, dpi=300)
+
+    # mostra solo se notebook
+    if show and IN_NOTEBOOK:
+        display(plt.gcf())
+
     plt.close()
     print(f"Salvato: {save_path}")
 
