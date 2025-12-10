@@ -5,7 +5,7 @@ from typing import Tuple, Dict, Any
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from tqdm.auto import tqdm
+from tqdm.notebook import tqdm
 import torch.nn.functional as F
 
 
@@ -25,8 +25,8 @@ def train_one_epoch(model, loader, optim, device, desc="train"):
     pbar = tqdm(
         loader,
         desc=desc,
-        leave=True,           # mantiene la barra alla fine dell’epoca
-        dynamic_ncols=True
+        leave=False,  # non lascia tutte le barre in output
+        ncols=80  # larghezza fissa, evita glitch
     )
 
     for x, y in pbar:
