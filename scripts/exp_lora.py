@@ -38,6 +38,8 @@ def run_lora_experiment(
     weight_decay: float = 0.0,
     batch_size: int = 128,
     num_workers: int = 0,
+    freeze_base: bool = True,
+    freeze_head: bool = False,
     device: str | None = None,
     out_dir: str | Path = PROJECT_ROOT / "outputs_lora_cl",
 ):
@@ -99,7 +101,7 @@ def run_lora_experiment(
         rank=rank,
         alpha=alpha,
     )
-    init_lora_from_mlp(backbone, lora_model, freeze_base=True, freeze_head=True)
+    init_lora_from_mlp(backbone, lora_model, freeze_base=freeze_base, freeze_head=freeze_head)
 
     # controlliamo quanti parametri sono trainabili
     total_params = sum(p.numel() for p in lora_model.parameters())
