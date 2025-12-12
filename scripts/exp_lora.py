@@ -38,8 +38,7 @@ def run_lora_experiment(
     weight_decay: float = 0.0,
     batch_size: int = 128,
     num_workers: int = 0,
-    freeze_base: bool = True,
-    freeze_head: bool = False,
+    head_mode: str = "unfrozen", # opzioni: 'frozen', 'unfrozen', 'partial'
     device: str | None = None,
     out_dir: str | Path = PROJECT_ROOT / "outputs_lora_cl",
 ):
@@ -91,6 +90,7 @@ def run_lora_experiment(
     # ---------------------------------------------------------
     # 2) Inizializza modello LoRA dal backbone
     # ---------------------------------------------------------
+    # 1. Creazione modello LoRA
     print("\n=== Inizializzazione MLPWithLoRA dal backbone ===")
     lora_model = MLPWithLoRA(
         input_dim,
@@ -101,7 +101,48 @@ def run_lora_experiment(
         rank=rank,
         alpha=alpha,
     )
-    init_lora_from_mlp(backbone, lora_model, freeze_base=freeze_base, freeze_head=freeze_head)
+    # 2. Copia pesi e congela la base
+    # Nota: passiamo freeze_head=False qui perché lo gestiamo manualmente sotto
+    init_lora_from_mlp(backbone, lora_model, freeze_base=True, freeze_head=False)
+
+    # 3. Gestione Avanzata della Head (fc3)
+    if head_mode == 'frozen':
+        # Congela tutto l'ultimo layer
+        lora_model.fc3.weight.requires_grad = False
+        lora_model.fc3.bias.requires_grad = False
+        print("--> Head Mode: FROZEN (Tutto il classificatore fisso)")
+
+    elif head_mode == 'unfrozen':
+        # Lascia tutto libero (il comportamento che avevi prima con freeze_head=False)
+        lora_model.fc3.weight.requires_grad = True
+        lora_model.fc3.bias.requires_grad = True
+        print("--> Head Mode: UNFROZEN (Tutto il classificatore allenabile)")
+
+    elif head_mode == 'partial':
+        # Partial Freeze (Masking dei gradienti)
+        lora_model.fc3.weight.requires_grad = True
+        lora_model.fc3.bias.requires_grad = True
+
+        # Definiamo un hook che azzera i gradienti per le classi 0-4 (Task A)
+        def mask_grads_hook(grad):
+            grad_clone = grad.clone()
+            # Azzera le righe 0,1,2,3,4 (Task A) -> Non si aggiorneranno
+            grad_clone[0:5, :] = 0
+            # Le righe 5,6,7 (Task B) rimangono intatte
+            return grad_clone
+
+        # Registriamo l'hook sul tensore dei pesi
+        lora_model.fc3.weight.register_hook(mask_grads_hook)
+
+        # Facciamo lo stesso per il bias (opzionale, ma consigliato)
+        def mask_bias_hook(grad):
+            grad_clone = grad.clone()
+            grad_clone[0:5] = 0
+            return grad_clone
+
+        lora_model.fc3.bias.register_hook(mask_bias_hook)
+
+        print("--> Head Mode: PARTIAL (Classi 0-4 congelate, 5-7 allenabili)")
 
     # controlliamo quanti parametri sono trainabili
     total_params = sum(p.numel() for p in lora_model.parameters())
