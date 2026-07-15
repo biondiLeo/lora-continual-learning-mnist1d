@@ -1,0 +1,57 @@
+# -------- Python --------
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# -------- Virtual environments --------
+.venv/
+venv/
+env/
+ENV/
+
+# -------- Dataset (downloaded on first run) --------
+data/
+*.pkl
+
+# -------- Experiment outputs, checkpoints, weights --------
+outputs/
+runs/
+*.pt
+*.pth
+*.ckpt
+
+# -------- Reports / LaTeX / slides (kept out of the code repo) --------
+*.tex
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.pdf
+*.pptx
+*.docx
+
+# -------- OS / editor / IDE --------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# -------- Credentials / secrets --------
+*.env
+.env
+*.key
+*.pem
+secrets.*

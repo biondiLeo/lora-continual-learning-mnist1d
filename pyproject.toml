@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mnist1d-cl"
+version = "0.1.0"
+description = "LoRA in class-incremental continual learning on MNIST-1D"
+requires-python = ">=3.10"
+# Dependencies are pinned in requirements.txt. They are intentionally left
+# unconstrained here so that `pip install -e . --no-deps` does not attempt to
+# re-resolve the (already installed, CUDA-built) heavy packages.
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,11 @@
+# Runtime dependencies actually imported by the published code.
+# torch is used as a CUDA build (cu121) in the development environment; on CPU
+#   `pip install torch==2.5.1` is sufficient. For a GPU build see
+#   https://download.pytorch.org/whl/cu121
+torch==2.5.1
+numpy==2.2.1
+scikit-learn==1.6.1
+scipy==1.15.1
+matplotlib==3.10.0
+# Testing only
+pytest==8.3.4
